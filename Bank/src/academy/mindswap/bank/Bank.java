@@ -18,7 +18,6 @@ public class Bank {
     }
 
     public void createAccount(String typeOfAccount,String clientId ) {
-
         if(!accounts.containsKey(clientId) && typeOfAccount.equals("credit")){
             accounts.putIfAbsent(clientId,new ArrayList<>());
             accounts.get(clientId).add(new Credit());
@@ -56,11 +55,12 @@ public class Bank {
             accounts.get(clientId).add(new Debit());
             System.out.println(OPENED_DEBIT);
         }
-
     }
 
     public boolean checkIfHasAccount(String clientId, String typeOfAccount) {
-
+        if(accounts.get(clientId) == null){
+            return false;
+        }
         if(typeOfAccount.equals("credit")){
             return accounts.get(clientId).stream().filter(e -> e instanceof Credit).count() == 1;
         }
@@ -110,8 +110,8 @@ public class Bank {
             switch (typeOfAccount){
                 case "credit":
                     List<Account> x = accounts.get(clientId).stream().filter(e-> e instanceof Credit).toList();
-                   x.get(0).pay(amount);
-                   return;
+                    x.get(0).pay(amount);
+                    return;
                 case "debit":
                     List<Account> y = accounts.get(clientId).stream().filter(e-> e instanceof Debit).toList();
                     y.get(0).pay(amount);

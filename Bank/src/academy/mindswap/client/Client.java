@@ -26,7 +26,6 @@ public class Client {
             System.out.println(ENTER_BANK);
             return;
         }
-
         if(!hasId){
             clientId = "cl" + (++counter);
             System.out.println("Id: " + clientId);
@@ -41,12 +40,10 @@ public class Client {
             System.out.println(ENTER_BANK);
             return;
         }
-
         if(!hasId){
             System.out.println(NEED_ID);
             return;
         }
-
         bank.createAccount(typeOfAccount,clientId);
     }
 
@@ -55,92 +52,63 @@ public class Client {
             System.out.println(ENTER_BANK);
             return;
         }
-
         if(!hasId){
             System.out.println(NEED_ID);
             return;
         }
-
         if(!bank.checkIfHasAccount(clientId,typeOfAccount)){
             System.out.println("You need to have an account of " + typeOfAccount + " type to ask this.");
             return;
         }
-
-        System.out.println("Here is your " + typeOfAccount + " card!");
+        System.out.printf("Here is your " + typeOfAccount + " card!");
         cards.add(typeOfAccount);
     }
 
     private boolean checkBankPresence(){return bank != null;}
 
     public void deposit(String typeOfAccount, int amount) {
-        
-        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
-            System.out.println(NEED_CARD);
+        if(!checkConditions(typeOfAccount)){
             return;
         }
-        
         bank.depositOnAccount(typeOfAccount,amount,clientId);
     }
 
     public void checkBalance(String typeOfAccount) {
-
-        if(!checkBankPresence()){
-            System.out.println(ENTER_BANK);
+        if(!checkConditions(typeOfAccount)){
             return;
         }
-
-        if(!hasId){
-            System.out.println(NEED_ID);
-            return;
-        }
-
-        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
-            System.out.println(NEED_CARD);
-            return;
-        }
-
         int balance = bank.askForBalance(typeOfAccount, clientId);
         System.out.println(balance == -1 ? NEED_ACCOUNT
                                          : "Your balance on your " + typeOfAccount + " account is " + balance);
     }
 
     public void pay(String typeOfAccount, int amount) {
-
-        if(!checkBankPresence()){
-            System.out.println(ENTER_BANK);
+        if(!checkConditions(typeOfAccount)){
             return;
         }
-
-        if(!hasId){
-            System.out.println(NEED_ID);
-            return;
-        }
-
-        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
-            System.out.println(NEED_CARD);
-            return;
-        }
-
         bank.paymentWithAccount(typeOfAccount,amount, clientId);
     }
 
     public void withdraw(String typeOfAccount, int amount) {
+        if(!checkConditions(typeOfAccount)){
+            return;
+        }
+        bank.withdrawMoney(typeOfAccount,amount,clientId);
+    }
 
+    private boolean checkConditions(String typeOfAccount){
         if(!checkBankPresence()){
             System.out.println(ENTER_BANK);
-            return;
+            return false;
         }
-
         if(!hasId){
             System.out.println(NEED_ID);
-            return;
+            return false;
         }
-
         if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
             System.out.println(NEED_CARD);
-            return;
+            return false;
         }
-
-        bank.withdrawMoney(typeOfAccount,amount,clientId);
+        return true;
     }
 }
