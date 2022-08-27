@@ -2,14 +2,19 @@ package academy.mindswap.client;
 
 import academy.mindswap.bank.Bank;
 
+import java.util.ArrayList;
+import java.util.List;
+
+import static academy.mindswap.util.Messages.*;
+
 
 public class Client {
 
     private Bank bank;
     private String clientId;
+    private final List<String> cards = new ArrayList<>();
     private boolean hasId;
     private static int counter;
-
 
 
     public void setBank(Bank bank) {
@@ -18,7 +23,7 @@ public class Client {
 
     public void askForId(){
         if(!checkBankPresence()){
-            System.out.println("Please enter a bank first.");
+            System.out.println(ENTER_BANK);
             return;
         }
 
@@ -28,17 +33,17 @@ public class Client {
             hasId = true;
             return;
         }
-        System.out.println("You already have an Id.");
+        System.out.println(HAVE_ID);
     }
 
     public void createAccount(String typeOfAccount){
         if(!checkBankPresence()){
-            System.out.println("Should have a bank first.");
+            System.out.println(ENTER_BANK);
             return;
         }
 
         if(!hasId){
-            System.out.println("You need a bank id for this operation, try to get one first.");
+            System.out.println(NEED_ID);
             return;
         }
 
@@ -47,41 +52,95 @@ public class Client {
 
     public void askForCard(String typeOfAccount){
         if(!checkBankPresence()){
-            System.out.println("Enter a bank first.");
+            System.out.println(ENTER_BANK);
             return;
         }
 
         if(!hasId){
-            System.out.println("You need a bank id for this operation, try to get one first.");
+            System.out.println(NEED_ID);
             return;
         }
 
-        if(typeOfAccount.equals("credit")){
-
-            if(!bank.checkIfHasAccount(clientId,typeOfAccount)){
-                System.out.println("You need to have an account of " + typeOfAccount + " type to ask this.");
-                return;
-            }
-
-            System.out.println("Here is your " + typeOfAccount + " card!");
+        if(!bank.checkIfHasAccount(clientId,typeOfAccount)){
+            System.out.println("You need to have an account of " + typeOfAccount + " type to ask this.");
             return;
         }
 
-        if(typeOfAccount.equals("debit")){
+        System.out.println("Here is your " + typeOfAccount + " card!");
+        cards.add(typeOfAccount);
+    }
 
-            if(!bank.checkIfHasAccount(clientId,typeOfAccount)){
-                System.out.println("You need to have an account of " + typeOfAccount + " type to ask this.");
-                return;
-            }
+    private boolean checkBankPresence(){return bank != null;}
 
-            System.out.println("Here is your " + typeOfAccount + " card!");
+    public void deposit(String typeOfAccount, int amount) {
+        
+        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
+            System.out.println(NEED_CARD);
+            return;
+        }
+        
+        bank.depositOnAccount(typeOfAccount,amount,clientId);
+    }
+
+    public void checkBalance(String typeOfAccount) {
+
+        if(!checkBankPresence()){
+            System.out.println(ENTER_BANK);
+            return;
         }
 
+        if(!hasId){
+            System.out.println(NEED_ID);
+            return;
+        }
+
+        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
+            System.out.println(NEED_CARD);
+            return;
+        }
+
+        int balance = bank.askForBalance(typeOfAccount, clientId);
+        System.out.println(balance == -1 ? NEED_ACCOUNT
+                                         : "Your balance on your " + typeOfAccount + " account is " + balance);
     }
 
-    private boolean checkBankPresence(){
-       return bank != null;
+    public void pay(String typeOfAccount, int amount) {
+
+        if(!checkBankPresence()){
+            System.out.println(ENTER_BANK);
+            return;
+        }
+
+        if(!hasId){
+            System.out.println(NEED_ID);
+            return;
+        }
+
+        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
+            System.out.println(NEED_CARD);
+            return;
+        }
+
+        bank.paymentWithAccount(typeOfAccount,amount, clientId);
     }
 
+    public void withdraw(String typeOfAccount, int amount) {
 
+        if(!checkBankPresence()){
+            System.out.println(ENTER_BANK);
+            return;
+        }
+
+        if(!hasId){
+            System.out.println(NEED_ID);
+            return;
+        }
+
+        if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
+            System.out.println(NEED_CARD);
+            return;
+        }
+
+        bank.withdrawMoney(typeOfAccount,amount,clientId);
+    }
 }
