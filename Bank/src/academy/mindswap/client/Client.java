@@ -36,24 +36,14 @@ public class Client {
     }
 
     public void createAccount(String typeOfAccount){
-        if(!checkBankPresence()){
-            System.out.println(ENTER_BANK);
-            return;
-        }
-        if(!hasId){
-            System.out.println(NEED_ID);
+        if(!checkBasicConditions(typeOfAccount)){
             return;
         }
         bank.createAccount(typeOfAccount,clientId);
     }
 
     public void askForCard(String typeOfAccount){
-        if(!checkBankPresence()){
-            System.out.println(ENTER_BANK);
-            return;
-        }
-        if(!hasId){
-            System.out.println(NEED_ID);
+        if(!checkBasicConditions(typeOfAccount)){
             return;
         }
         if(!bank.checkIfHasAccount(clientId,typeOfAccount)){
@@ -67,14 +57,14 @@ public class Client {
     private boolean checkBankPresence(){return bank != null;}
 
     public void deposit(String typeOfAccount, int amount) {
-        if(!checkConditions(typeOfAccount)){
+        if(!checkFullConditions(typeOfAccount)){
             return;
         }
         bank.depositOnAccount(typeOfAccount,amount,clientId);
     }
 
     public void checkBalance(String typeOfAccount) {
-        if(!checkConditions(typeOfAccount)){
+        if(!checkFullConditions(typeOfAccount)){
             return;
         }
         int balance = bank.askForBalance(typeOfAccount, clientId);
@@ -83,20 +73,20 @@ public class Client {
     }
 
     public void pay(String typeOfAccount, int amount) {
-        if(!checkConditions(typeOfAccount)){
+        if(!checkFullConditions(typeOfAccount)){
             return;
         }
         bank.paymentWithAccount(typeOfAccount,amount, clientId);
     }
 
     public void withdraw(String typeOfAccount, int amount) {
-        if(!checkConditions(typeOfAccount)){
+        if(!checkFullConditions(typeOfAccount)){
             return;
         }
         bank.withdrawMoney(typeOfAccount,amount,clientId);
     }
 
-    private boolean checkConditions(String typeOfAccount){
+    private boolean checkFullConditions(String typeOfAccount){
         if(!checkBankPresence()){
             System.out.println(ENTER_BANK);
             return false;
@@ -107,6 +97,18 @@ public class Client {
         }
         if(cards.stream().noneMatch(e -> e.equals(typeOfAccount))){
             System.out.println(NEED_CARD);
+            return false;
+        }
+        return true;
+    }
+
+    private boolean checkBasicConditions(String typeOfAccount){
+        if(!checkBankPresence()){
+            System.out.println(ENTER_BANK);
+            return false;
+        }
+        if(!hasId){
+            System.out.println(NEED_ID);
             return false;
         }
         return true;
